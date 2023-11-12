@@ -5,5 +5,6 @@ define('DB_USER', 'root');
 define('DB_PASSWORD', '');
 define('USER_ADMIN_PASSWORD', 'admin');
 define('USER_PASSWORD', 'user');
+define('JWT_KEY', 'admin');
 
 ?>

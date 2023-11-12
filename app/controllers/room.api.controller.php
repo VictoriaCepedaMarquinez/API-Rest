@@ -1,23 +1,24 @@
 <?php
 require_once 'app/models/rooms.model.php';
 require_once 'app/controllers/api.controller.php';
+require_once 'app/helpers/auth.api.helper.php';
 class RoomApiController extends ApiController{
     private $model;
+    private $authHelper;
     
     function __construct(){
         parent::__construct();
         $this->model = new RoomsModel(); 
+        $this->authHelper = new authHelper;
     }
 
     function get($params = []){
         if(empty($params)){
-            // Verifica si se solicita paginación
-            $page = isset($_GET['page']) ? intval($_GET['page']) : 1; // Página actual
-            $per_page = isset($_GET['per_page']) ? intval($_GET['per_page']) : 10; // Elementos por página
+            $page = isset($_GET['page']) ? intval($_GET['page']) : 1; 
+            $per_page = isset($_GET['per_page']) ? intval($_GET['per_page']) : 10; 
             $sort_by = isset($_GET['sort_by']) ? $_GET['sort_by'] : 'id';
             $order = isset($_GET['order']) ? $_GET['order'] : 'asc';
     
-          
             $rooms = $this->model->getRooms($sort_by, $order, $page, $per_page);
             return $this->view->response($rooms, 200);
         }else{
@@ -32,6 +33,16 @@ class RoomApiController extends ApiController{
     }
 
     function update($params = []){
+        $user = $this->authHelper->currentUser();
+        if(!$user) {
+            $this->view->response('Unauthorized', 401);
+            return;
+        }
+
+        if($user->admin != 1){
+            $this->view->response('Forbidden', 403);
+            return;
+        }
         $id = $params[':ID'];
         $reserve = $this->model->getRoom($id);
           if($reserve){
@@ -49,6 +60,16 @@ class RoomApiController extends ApiController{
       }
 
     function create(){
+        $user = $this->authHelper->currentUser();
+        if(!$user) {
+            $this->view->response('Unauthorized', 401);
+            return;
+        }
+
+        if($user->admin != 1){
+            $this->view->response('Forbidden', 403);
+            return;
+        }
         $body = $this->getData();
         $tamaño = $body->tamaño;
         $descripcion = $body->descripcion;
@@ -56,7 +77,7 @@ class RoomApiController extends ApiController{
         $precio = $body->precio;
 
         $id = $this->model->insertRooms($tamaño,$descripcion,$imagen,$precio);
-        $this->view->response(('la habitacion fue insertada con el id=' . $id) , 201);
+        $this->view->response(('la habitacion fue insertada') , 201);
     }
 
     public function filterRooms(){
