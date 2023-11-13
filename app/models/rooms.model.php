@@ -22,18 +22,26 @@ class RoomsModel extends ModelDB {
     public function getRooms($sort_by, $order, $page, $per_page) {
         $limit = $per_page;
         $offset = ($page - 1) * $per_page;
-        $query = "SELECT * FROM habitacion ORDER BY $sort_by $order LIMIT $limit OFFSET $offset";
-        $data = $this->db->prepare($query);
-        $data->execute();
-        $rooms = $data->fetchAll(PDO::FETCH_OBJ);
+        $query = $this->db->prepare("SELECT * FROM habitacion ORDER BY $sort_by $order LIMIT :limit OFFSET :offset");
+    
+        // Vincula los valores de los marcadores de posición
+        $query->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $query->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $query->execute();
+        $rooms = $query->fetchAll(PDO::FETCH_OBJ);
         return $rooms;
-    }
+    } 
 
-    public function filterRooms($filter, $type){
-        $query = $this->db->prepare("SELECT * FROM habitacion WHERE $filter = ?");
-        $query->execute([$type]);
+
+    public function filterRooms($filter, $type) {
+        $allowedFilters = ["id","tamaño", "descripcion", "imagen", "precio"];
+        $filter = in_array($filter, $allowedFilters) ? $filter : "precio";
+        $query = $this->db->prepare("SELECT * FROM habitacion WHERE $filter = :type");
+    
+        // Vincular el valor del marcador de posición
+        $query->bindParam(':type', $type, PDO::PARAM_STR);
+        $query->execute();
         $roomsFilter = $query->fetchAll(PDO::FETCH_OBJ);
         return $roomsFilter;
     }
-
 }
