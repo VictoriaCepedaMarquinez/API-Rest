@@ -80,8 +80,29 @@ class RoomApiController extends ApiController{
         $this->view->response(('la habitacion fue insertada') , 201);
     }
 
+    function delete($params = []){
+        $user = $this->authHelper->currentUser();
+        if(!$user) {
+            $this->view->response('Unauthorized', 401);
+            return;
+        }
+
+        if($user->admin != 1){
+            $this->view->response('Forbidden', 403);
+            return;
+        }
+        $id = $params[':ID'];
+        $room = $this->model->getRoom($id);
+
+        if($room){
+            $this->model->deleteRoom($id);
+            $this->view->response($room -> tamaño . " eliminada", 200);
+        } else {
+            $this->view->response("habitacion con ID= " . $id . " no encontrada", 404);
+        }
+    }
+
     public function filterRooms(){
-        
         $filter = $_GET['filter'];
         $type = $_GET['type'];
 

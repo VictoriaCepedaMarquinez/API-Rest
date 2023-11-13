@@ -9,6 +9,7 @@ $router->addRoute('rooms/:ID',       'PUT', 'RoomApiController',      'update');
 $router->addRoute('rooms/:ID',       'GET', 'RoomApiController',      'get');
 $router->addRoute('rooms',           'GET', 'RoomApiController',      'get');
 $router->addRoute('rooms',           'POST','RoomApiController',      'create');
+$router->addRoute('rooms/:ID',           'DELETE','RoomApiController',      'delete');
 $router->addRoute('room',            'GET', 'RoomApiController',      'filterRooms');
 $router->addRoute('user/token',      'GET', 'UserApiController',      'getToken');
 

@@ -12,6 +12,11 @@ class RoomsModel extends ModelDB {
         $query->execute([$tamaño, $descripcion, $imagen, $precio, $id]);
     }
 
+    function deleteRoom($id){
+        $query = $this->db->prepare('DELETE FROM habitacion WHERE id = ?');
+        $query->execute([$id]);
+    }
+
     public function getRoom($room_id){
         $query=$this->db->prepare('SELECT * FROM habitacion WHERE id=?');
         $query->execute([$room_id]);
